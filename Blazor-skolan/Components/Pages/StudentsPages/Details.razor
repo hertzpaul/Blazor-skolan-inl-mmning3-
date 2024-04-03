@@ -1,0 +1,51 @@
+﻿@page "/students/details"
+@inject Blazor_skolan.Data.Blazor_skolanContext DB
+@using Blazor_skolan.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Students</h4>
+    <hr />
+    @if (students is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">firstName</dt>
+            <dd class="col-sm-10">@students.firstName</dd>
+            <dt class="col-sm-2">lastName</dt>
+            <dd class="col-sm-10">@students.lastName</dd>
+            <dt class="col-sm-2">birthDay</dt>
+            <dd class="col-sm-10">@students.birthDay</dd>
+            <dt class="col-sm-2">email</dt>
+            <dd class="col-sm-10">@students.email</dd>
+        </dl>
+        <div>
+            <a href="@($"/students/edit?id={students.Id}")">Edit</a> |
+            <a href="@($"/students")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Students? students;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await DB.Students.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (students is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

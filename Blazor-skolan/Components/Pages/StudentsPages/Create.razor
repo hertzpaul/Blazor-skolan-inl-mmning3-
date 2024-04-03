@@ -1,0 +1,61 @@
+﻿@page "/students/create"
+@inject Blazor_skolan.Data.Blazor_skolanContext DB
+@using Blazor_skolan.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Ansök</PageTitle>
+
+<h1>Ansök</h1>
+
+<h4>Student formulär</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Students" OnValidSubmit="AddStudents" FormName="create" Enhance>
+
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-3">
+                <label for="firstname" class="form-label">Förnamn:</label> 
+                <InputText id="firstname" @bind-Value="Students.firstName" class="form-control" required/>
+                <ValidationMessage For="() => Students.firstName" class="text-danger"/> 
+            </div>   
+            
+            <div class="mb-3">
+                <label for="lastname" class="form-label">Efternamn:</label> 
+                <InputText id="lastname" @bind-Value="Students.lastName" class="form-control" required/>
+                <ValidationMessage For="() => Students.lastName" class="text-danger"/> 
+            </div>  
+            
+            <div class="mb-3">
+                <label for="birthday" class="form-label">Födelsedatum:</label> 
+                <InputDate id="birthday" @bind-Value="Students.birthDay" class="form-control" required/>
+                <ValidationMessage For="() => Students.birthDay" class="text-danger"/> 
+            </div>  
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label> 
+                <InputText id="email" @bind-Value="Students.email" class="form-control" required />
+                <ValidationMessage For="() => Students.email" class="text-danger" /> 
+            </div>
+       
+            <button type="submit" class="btn btn-primary">Ansök</button>
+        </EditForm>
+    </div>
+</div>
+
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Students Students { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddStudents()
+    {
+        DB.Students.Add(Students);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/students");
+    }
+}

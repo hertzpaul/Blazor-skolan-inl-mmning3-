@@ -1,0 +1,76 @@
+﻿@page "/students"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject Blazor_skolan.Data.Blazor_skolanContext DB
+@using Blazor_skolan.Models
+@rendermode InteractiveServer
+
+<PageTitle>Admistration</PageTitle>
+
+<h1>Admistration</h1>
+
+<p>
+    <a href="students/create">Lägg till fler</a>
+</p>
+
+<QuickGrid Class="table" Items="FilteredStudents" Pagination="state">
+
+    <PropertyColumn Property="students => students.firstName" Title="Förnamn"Sortable="true">
+        <ColumnOptions>
+            <div>
+                <input type="search" @bind="firstNameFilter" @bind:event="oninput" autofocus/>
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+
+    <PropertyColumn Property="students => students.lastName" Title="Efternamn" Sortable="true">
+        <ColumnOptions>
+            <div>
+                <input type="search" @bind="lastNameFilter" @bind:event="oninput" autofocus />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+
+    <PropertyColumn Property="students => students.birthDay" Title="Födelseår" Format="yyyy/MM/dd" Sortable="true">
+        <ColumnOptions>
+            <div>
+                <input type="search" @bind="ageFilter" @bind:event="oninput" autofocus />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    
+    <PropertyColumn Property="students => students.email" Title="Email">
+        <ColumnOptions>
+            <div>
+                <input type="search" @bind="emailFilter" @bind:event="oninput" autofocus />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+        
+
+    <TemplateColumn Context="students">
+        <a href="@($"students/edit?id={students.Id}")">Ändra</a> |
+        <a href="@($"students/details?id={students.Id}")">Detaljer</a> |
+        <a href="@($"students/delete?id={students.Id}")">Ta bort</a>
+    </TemplateColumn>
+</QuickGrid>
+
+<Paginator State="state" />
+
+@code{
+    PaginationState state = new PaginationState {ItemsPerPage = 12};
+    string firstNameFilter = "";
+    string lastNameFilter = "";
+    string emailFilter = "";
+    string ageFilter;
+
+    DateTime today = DateTime.Today;
+
+    IQueryable<Students> FilteredStudents =>
+    DB.Students
+        .Where(m => string.IsNullOrEmpty(firstNameFilter) || m.firstName.Contains(firstNameFilter))
+        .Where(m => string.IsNullOrEmpty(lastNameFilter) || m.lastName.Contains(lastNameFilter))
+        .Where(m => string.IsNullOrEmpty(emailFilter) || m.email.Contains(emailFilter))
+        .Where(m => string.IsNullOrEmpty(ageFilter) || (today.Year - m.birthDay.Year).ToString() == ageFilter);
+
+    
+}
